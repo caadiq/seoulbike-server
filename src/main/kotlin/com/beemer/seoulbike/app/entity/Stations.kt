@@ -14,13 +14,15 @@ data class Stations(
     @Column(name = "station_no", nullable = false)
     val stationNo: String,
 
-    @Column(name = "station_id")
-    val stationId: String?,
+    @Column(name = "station_id", nullable = false)
+    val stationId: String,
 
-    @Column(name = "station_nm")
-    val stationNm: String?,
+    @Column(name = "station_nm", nullable = false)
+    val stationNm: String,
 
-    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL])
-    var stationDetails: StationDetails? = null
+    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL] )
+    var stationDetails: StationDetails? = null,
+
+    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL] )
+    var liveRentInfo: LiveRentInfo? = null
 )
-
