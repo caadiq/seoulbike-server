@@ -8,7 +8,7 @@ import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "Stations")
+@Table(name = "\"Stations\"")
 data class Stations(
     @Id
     @Column(name = "station_no", nullable = false)

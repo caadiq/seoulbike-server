@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "LiveRentInfo")
+@Table(name = "\"LiveRentInfo\"")
 data class LiveRentInfo(
     @Id
     @Column(name = "station_no", nullable = false)

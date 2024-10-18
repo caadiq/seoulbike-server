@@ -10,7 +10,7 @@ class ApiScheduler(private val apiService: ApiService) {
 
     @PostConstruct
     fun init() {
-//        apiService.fetchStations(1)
+//        fetchStations()
         apiService.fetchLiveRentInfo(1)
     }
 

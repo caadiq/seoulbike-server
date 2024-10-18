@@ -8,9 +8,10 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
+import org.locationtech.jts.geom.Geometry
 
 @Entity
-@Table(name = "StationDetails")
+@Table(name = "\"StationDetails\"")
 data class StationDetails(
     @Id
     @Column(name = "station_no", nullable = false)
@@ -30,6 +31,9 @@ data class StationDetails(
 
     @Column(name = "station_lon")
     val stationLon: Double?,
+
+    @Column(name = "geom", columnDefinition = "geometry(Point,4326)")
+    val geom: Geometry? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_no")
