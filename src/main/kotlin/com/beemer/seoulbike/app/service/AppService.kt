@@ -4,6 +4,8 @@ import com.beemer.seoulbike.app.dto.NearbyStationListDto
 import com.beemer.seoulbike.app.dto.StationDetailsDto
 import com.beemer.seoulbike.app.dto.StationStatusDto
 import com.beemer.seoulbike.app.repository.StationsRepository
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.Point
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.format.DateTimeFormatter
@@ -13,15 +15,22 @@ class AppService(
     private val stationsRepository: StationsRepository
 ) {
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+    private val geometryFactory = GeometryFactory()
 
     fun getNearbyStations(lat: Double, lon: Double, distance: Double): ResponseEntity<List<NearbyStationListDto>> {
-        val nearbyStations = stationsRepository.findAllByLatAndLonNearby(lat, lon, distance / 100000.0)
+        val nearbyStations = stationsRepository.findAllByLatAndLonNearby(lat, lon, distance.div(100000.0))
+
+        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(lon, lat))
 
         return ResponseEntity.ok(nearbyStations.map {
+            val stationPoint: Point? = it.stationDetails?.geom as? Point
+            val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
+
             NearbyStationListDto(
                 stationNo = it.stationNo,
                 stationId = it.stationId,
                 stationNm = it.stationNm,
+                distance = distanceToStation,
                 stationDetails = StationDetailsDto(
                     addr1 = it.stationDetails?.stationAddr1,
                     addr2 = it.stationDetails?.stationAddr2,

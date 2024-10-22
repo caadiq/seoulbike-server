@@ -80,6 +80,7 @@ class ApiService(
     fun fetchLiveRentInfo(page: Int) {
         val startPage = page
         var endPage = page + 999
+        var totalCount = 0
 
         val url = "http://openapi.seoul.go.kr:8088/$apiKey/json/bikeList/$startPage/$endPage/"
 
@@ -88,7 +89,7 @@ class ApiService(
             .retrieve()
             .bodyToMono(BikeListDto::class.java)
             .subscribe({ dto ->
-                val totalCount = dto.rentBikeStatus.listTotalCount.toInt()
+                totalCount = dto.rentBikeStatus.listTotalCount.toInt()
                 val updateTime = LocalDateTime.now()
 
                 if (dto.rentBikeStatus.row.isNotEmpty()) {
@@ -111,7 +112,7 @@ class ApiService(
                     }
 
                     stationsRepository.saveAll(stationsList)
-
+                    
                     if (totalCount == 1000) {
                         fetchLiveRentInfo(endPage + 1)
                     } else {
@@ -121,6 +122,12 @@ class ApiService(
             }, { error ->
                 error.printStackTrace()
                 logger.error("[오류] fetchLiveRentInfo: ${error.message}")
+
+                if (totalCount == 1000) {
+                    fetchLiveRentInfo(endPage + 1)
+                } else {
+                    fetchLiveRentInfo(1)
+                }
             })
     }
 }
