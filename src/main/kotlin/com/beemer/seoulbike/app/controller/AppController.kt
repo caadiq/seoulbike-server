@@ -16,10 +16,12 @@ class AppController(
 
     @GetMapping("/stations/nearby")
     fun getNearbyStations(
-        @RequestParam("lat") lat: Double,
-        @RequestParam("lon") lon: Double,
+        @RequestParam("my_lat") myLat: Double,
+        @RequestParam("my_lon") myLon: Double,
+        @RequestParam("map_lat") mapLat: Double,
+        @RequestParam("map_lon") mapLon: Double,
         @RequestParam("distance") distance: Double
     ) : ResponseEntity<List<NearbyStationListDto>> {
-        return appService.getNearbyStations(lat, lon, distance)
+        return appService.getNearbyStations(myLat, myLon, mapLat, mapLon, distance)
     }
 }

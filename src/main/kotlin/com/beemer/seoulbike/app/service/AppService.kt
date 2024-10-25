@@ -17,10 +17,10 @@ class AppService(
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     private val geometryFactory = GeometryFactory()
 
-    fun getNearbyStations(lat: Double, lon: Double, distance: Double): ResponseEntity<List<NearbyStationListDto>> {
-        val nearbyStations = stationsRepository.findAllByLatAndLonNearby(lat, lon, distance.div(100000.0))
+    fun getNearbyStations(myLat: Double, myLon: Double, mapLat: Double, mapLon: Double, distance: Double): ResponseEntity<List<NearbyStationListDto>> {
+        val nearbyStations = stationsRepository.findAllByLatAndLonNearby(mapLat, mapLon, distance.div(100000.0))
 
-        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(lon, lat))
+        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
 
         return ResponseEntity.ok(nearbyStations.map {
             val stationPoint: Point? = it.stationDetails?.geom as? Point

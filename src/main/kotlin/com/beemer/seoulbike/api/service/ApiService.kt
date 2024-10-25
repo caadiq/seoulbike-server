@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.scheduler.Schedulers
 import java.time.LocalDateTime
 
 @Service
@@ -88,6 +89,7 @@ class ApiService(
             .uri(url)
             .retrieve()
             .bodyToMono(BikeListDto::class.java)
+            .subscribeOn(Schedulers.boundedElastic())
             .subscribe({ dto ->
                 totalCount = dto.rentBikeStatus.listTotalCount.toInt()
                 val updateTime = LocalDateTime.now()
@@ -116,6 +118,7 @@ class ApiService(
                     if (totalCount == 1000) {
                         fetchLiveRentInfo(endPage + 1)
                     } else {
+                        Thread.sleep(30000)
                         fetchLiveRentInfo(1)
                     }
                 }
@@ -126,6 +129,7 @@ class ApiService(
                 if (totalCount == 1000) {
                     fetchLiveRentInfo(endPage + 1)
                 } else {
+                    Thread.sleep(30000)
                     fetchLiveRentInfo(1)
                 }
             })
