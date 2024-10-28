@@ -1,18 +1,21 @@
 package com.beemer.seoulbike.api.service
 
-import com.beemer.seoulbike.api.dto.BikeListDto
 import com.beemer.seoulbike.api.dto.CycleStationInfoDto
-import com.beemer.seoulbike.app.entity.LiveRentInfo
+import com.beemer.seoulbike.api.dto.StationRealtimeStatusDto
 import com.beemer.seoulbike.app.entity.StationDetails
+import com.beemer.seoulbike.app.entity.StationRealtimeStatus
 import com.beemer.seoulbike.app.entity.Stations
 import com.beemer.seoulbike.app.repository.StationsRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.scheduler.Schedulers
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ApiService(
@@ -47,14 +50,13 @@ class ApiService(
 
                     dto.stationInfo.row.forEach { row ->
                         val station = Stations(
-                            stationNo = row.rentNo,
-                            stationNm = row.rentNm,
                             stationId = row.rentId,
+                            stationNo = row.rentNo,
+                            stationNm = row.rentNm
                         )
 
                         val stationDetails = StationDetails(
-                            stationNo = row.rentNo,
-                            holdNum = row.holdNum?.toIntOrNull(),
+                            stationId = row.rentId,
                             stationAddr1 = row.staAdd1,
                             stationAddr2 = row.staAdd2,
                             stationLat = row.staLat.toDouble(),
@@ -78,60 +80,43 @@ class ApiService(
     }
 
     @Transactional
-    fun fetchLiveRentInfo(page: Int) {
-        val startPage = page
-        var endPage = page + 999
-        var totalCount = 0
+    fun fetchStationRealtimeStatus() {
+        val url = "https://www.bikeseoul.com/app/station/getStationRealtimeStatus.do"
 
-        val url = "http://openapi.seoul.go.kr:8088/$apiKey/json/bikeList/$startPage/$endPage/"
-
-        webClient.get()
+        webClient.post()
             .uri(url)
+            .body(BodyInserters.fromFormData("stationGrpSeq", "ALL"))
             .retrieve()
-            .bodyToMono(BikeListDto::class.java)
-            .subscribeOn(Schedulers.boundedElastic())
+            .bodyToMono(StationRealtimeStatusDto::class.java)
             .subscribe({ dto ->
-                totalCount = dto.rentBikeStatus.listTotalCount.toInt()
                 val updateTime = LocalDateTime.now()
 
-                if (dto.rentBikeStatus.row.isNotEmpty()) {
+                if (dto.realtimeList.isNotEmpty()) {
+                    val stationIds = dto.realtimeList.map { it.stationId }
+                    val existingStationsMap = stationsRepository.findByStationIdIn(stationIds)
+                        .associateBy { it.stationId }
+
                     val stationsList: MutableList<Stations> = mutableListOf()
 
-                    dto.rentBikeStatus.row.forEach { row ->
-                        val stations = stationsRepository.findByStationId(row.stationId)
-                        stations?.let {
-                            val liveRentInfo = LiveRentInfo(
-                                stationNo = it.stationNo,
-                                stationId = row.stationId,
-                                rackCnt = row.rackTotCnt.toIntOrNull(),
-                                parkingCnt = row.parkingBikeTotCnt.toIntOrNull(),
+                    dto.realtimeList.forEach { station ->
+                        existingStationsMap[station.stationId]?.let { existingStation ->
+                            val realtimeStatus = StationRealtimeStatus(
+                                stationId = station.stationId,
+                                rackCnt = station.rackTotCnt.toIntOrNull(),
+                                qrBikeCnt = station.parkingQRBikeCnt.toIntOrNull(),
+                                elecBikeCnt = station.parkingELECBikeCnt.toIntOrNull(),
                                 updateTime = updateTime,
-                                station = it
+                                station = existingStation
                             )
-                            it.liveRentInfo = liveRentInfo
-                            stationsList.add(it)
+                            existingStation.stationRealtimeStatus = realtimeStatus
+                            stationsList.add(existingStation)
                         }
                     }
 
                     stationsRepository.saveAll(stationsList)
-                    
-                    if (totalCount == 1000) {
-                        fetchLiveRentInfo(endPage + 1)
-                    } else {
-                        Thread.sleep(30000)
-                        fetchLiveRentInfo(1)
-                    }
                 }
             }, { error ->
                 error.printStackTrace()
-                logger.error("[오류] fetchLiveRentInfo: ${error.message}")
-
-                if (totalCount == 1000) {
-                    fetchLiveRentInfo(endPage + 1)
-                } else {
-                    Thread.sleep(30000)
-                    fetchLiveRentInfo(1)
-                }
             })
     }
 }

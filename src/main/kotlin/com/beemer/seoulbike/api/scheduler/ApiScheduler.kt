@@ -11,11 +11,16 @@ class ApiScheduler(private val apiService: ApiService) {
     @PostConstruct
     fun init() {
 //        fetchStations()
-        apiService.fetchLiveRentInfo(1)
+//        apiService.fetchStationRealtimeStatus()
     }
 
     @Scheduled(cron = "0 0 * * * *")
     fun fetchStations() {
         apiService.fetchStations(1)
+    }
+
+    @Scheduled(fixedRate = 30000)
+    fun fetchStationRealtimeStatus() {
+        apiService.fetchStationRealtimeStatus()
     }
 }

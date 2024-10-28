@@ -11,11 +11,11 @@ import jakarta.persistence.Table
 @Table(name = "\"Stations\"")
 data class Stations(
     @Id
-    @Column(name = "station_no", nullable = false)
-    val stationNo: String,
-
     @Column(name = "station_id", nullable = false)
     val stationId: String,
+
+    @Column(name = "station_no", nullable = false)
+    val stationNo: String,
 
     @Column(name = "station_nm", nullable = false)
     val stationNm: String,
@@ -24,5 +24,5 @@ data class Stations(
     var stationDetails: StationDetails? = null,
 
     @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL] )
-    var liveRentInfo: LiveRentInfo? = null
+    var stationRealtimeStatus: StationRealtimeStatus? = null
 )

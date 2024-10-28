@@ -26,7 +26,7 @@ class AppController(
         return appService.getNearbyStations(myLat, myLon, mapLat, mapLon, distance)
     }
 
-    @GetMapping("stations")
+    @GetMapping("/stations")
     fun getStations(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") limit: Int,

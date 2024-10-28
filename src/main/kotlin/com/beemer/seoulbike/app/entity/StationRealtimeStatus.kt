@@ -11,26 +11,26 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "\"LiveRentInfo\"")
-data class LiveRentInfo(
+@Table(name = "\"StationRealtimeStatus\"")
+data class StationRealtimeStatus(
     @Id
-    @Column(name = "station_no", nullable = false)
-    val stationNo: String,
-
     @Column(name = "station_id", nullable = false)
     val stationId: String,
 
     @Column(name = "rack_cnt")
     val rackCnt: Int?,
 
-    @Column(name = "parking_cnt")
-    val parkingCnt: Int?,
+    @Column(name = "qr_bike_cnt")
+    val qrBikeCnt: Int?,
+
+    @Column(name = "elec_bike_cnt")
+    val elecBikeCnt: Int?,
 
     @Column(name = "update_time", nullable = false)
     val updateTime: LocalDateTime,
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_no")
+    @JoinColumn(name = "station_id")
     @MapsId
     val station: Stations
 )

@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface StationsRepository : JpaRepository<Stations, String> {
-    @Query("SELECT s FROM Stations s WHERE s.stationId = :stationId")
-    fun findByStationId(stationId: String): Stations?
+    @Query("SELECT s FROM Stations s WHERE s.stationId IN :stationIds")
+    fun findByStationIdIn(@Param("stationIds") stationIds: List<String>): List<Stations>
 
     @Query("""
         SELECT s.* FROM "Stations" s
-        JOIN "StationDetails" sd ON sd.station_no = s.station_no
+        JOIN "StationDetails" sd ON sd.station_id = s.station_id
         WHERE ST_DWithin(
             sd.geom,
             ST_SetSRID(ST_MakePoint(:lon, :lat), 4326),

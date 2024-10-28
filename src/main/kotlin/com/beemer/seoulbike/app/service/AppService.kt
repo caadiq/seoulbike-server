@@ -31,21 +31,21 @@ class AppService(
             val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
             StationListDto(
-                stationNo = station.stationNo,
                 stationId = station.stationId,
+                stationNo = station.stationNo,
                 stationNm = station.stationNm,
                 distance = distanceToStation,
                 stationDetails = StationDetailsDto(
                     addr1 = station.stationDetails?.stationAddr1,
                     addr2 = station.stationDetails?.stationAddr2,
-                    holdNum = station.stationDetails?.holdNum,
                     lat = station.stationDetails?.stationLat,
                     lon = station.stationDetails?.stationLon
                 ),
                 stationStatus = StationStatusDto(
-                    rackCnt = station.liveRentInfo?.rackCnt,
-                    parkingCnt = station.liveRentInfo?.parkingCnt,
-                    updateTime = station.liveRentInfo?.updateTime?.format(dateTimeFormatter)
+                    rackCnt = station.stationRealtimeStatus?.rackCnt,
+                    qrBikeCnt = station.stationRealtimeStatus?.qrBikeCnt,
+                    elecBikeCnt = station.stationRealtimeStatus?.elecBikeCnt,
+                    updateTime = station.stationRealtimeStatus?.updateTime?.format(dateTimeFormatter)
                 )
             )
         })
@@ -75,21 +75,21 @@ class AppService(
             val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
             StationListDto(
-                stationNo = station.stationNo,
                 stationId = station.stationId,
+                stationNo = station.stationNo,
                 stationNm = station.stationNm,
                 distance = distanceToStation,
                 stationDetails = StationDetailsDto(
                     addr1 = station.stationDetails?.stationAddr1,
                     addr2 = station.stationDetails?.stationAddr2,
-                    holdNum = station.stationDetails?.holdNum,
                     lat = station.stationDetails?.stationLat,
                     lon = station.stationDetails?.stationLon
                 ),
                 stationStatus = StationStatusDto(
-                    rackCnt = station.liveRentInfo?.rackCnt,
-                    parkingCnt = station.liveRentInfo?.parkingCnt,
-                    updateTime = station.liveRentInfo?.updateTime?.format(dateTimeFormatter)
+                    rackCnt = station.stationRealtimeStatus?.rackCnt,
+                    qrBikeCnt = station.stationRealtimeStatus?.qrBikeCnt,
+                    elecBikeCnt = station.stationRealtimeStatus?.elecBikeCnt,
+                    updateTime = station.stationRealtimeStatus?.updateTime?.format(dateTimeFormatter)
                 )
             )
         }

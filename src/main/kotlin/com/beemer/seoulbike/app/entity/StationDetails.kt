@@ -14,11 +14,8 @@ import org.locationtech.jts.geom.Geometry
 @Table(name = "\"StationDetails\"")
 data class StationDetails(
     @Id
-    @Column(name = "station_no", nullable = false)
-    val stationNo: String,
-
-    @Column(name = "hold_num")
-    val holdNum: Int?,
+    @Column(name = "station_id", nullable = false)
+    val stationId: String,
 
     @Column(name = "station_addr1")
     val stationAddr1: String?,
@@ -36,7 +33,7 @@ data class StationDetails(
     val geom: Geometry? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_no")
+    @JoinColumn(name = "station_id")
     @MapsId
     val station: Stations
 )
