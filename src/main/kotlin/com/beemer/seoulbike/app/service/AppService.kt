@@ -1,5 +1,6 @@
 package com.beemer.seoulbike.app.service
 
+import com.beemer.seoulbike.app.dto.PopularStationDto
 import com.beemer.seoulbike.app.dto.StationDetailsDto
 import com.beemer.seoulbike.app.dto.StationListDto
 import com.beemer.seoulbike.app.dto.StationSearchDto
@@ -10,13 +11,15 @@ import com.beemer.seoulbike.common.dto.PageDto
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.format.DateTimeFormatter
 
 @Service
 class AppService(
-    private val stationsRepository: StationsRepository
+    private val stationsRepository: StationsRepository,
+    private val redisTemplate: RedisTemplate<String, String>
 ) {
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     private val geometryFactory = GeometryFactory()
@@ -141,5 +144,32 @@ class AppService(
         }
 
         return ResponseEntity.ok(StationSearchDto(pages, counts, stationListDto))
+    }
+
+    fun setPopularStation(dto: PopularStationDto): ResponseEntity<Unit> {
+        redisTemplate.opsForZSet().incrementScore("popularStations", "${dto.stationNo}.${dto.stationNm}", 1.0)
+        return ResponseEntity.ok().build()
+    }
+
+    fun getPopularStations(): ResponseEntity<List<PopularStationDto>> {
+        val key = "popularStations"
+        val zSetOperations = redisTemplate.opsForZSet()
+        val typedTuples = zSetOperations.reverseRangeWithScores(key, 0, 9)
+
+        val popularStations = typedTuples?.mapNotNull { typedTuple ->
+            typedTuple.value?.let { value ->
+                val parts = value.split(".")
+                if (parts.size >= 2) {
+                    PopularStationDto(
+                        stationNo = parts[0],
+                        stationNm = parts[1]
+                    )
+                } else {
+                    null
+                }
+            }
+        } ?: emptyList()
+
+        return ResponseEntity.ok().body(popularStations)
     }
 }

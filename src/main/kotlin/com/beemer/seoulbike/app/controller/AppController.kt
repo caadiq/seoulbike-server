@@ -1,5 +1,6 @@
 package com.beemer.seoulbike.app.controller
 
+import com.beemer.seoulbike.app.dto.PopularStationDto
 import com.beemer.seoulbike.app.dto.StationListDto
 import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.service.AppService
@@ -48,5 +49,17 @@ class AppController(
         @RequestBody stationId: List<String>
     ) : ResponseEntity<StationSearchDto> {
         return appService.getFavoriteStations(page, limit, myLat, myLon, stationId)
+    }
+
+    @PostMapping("/stations/popular")
+    fun setPopularStations(
+        @RequestBody dto: PopularStationDto
+    ) : ResponseEntity<Unit> {
+        return appService.setPopularStation(dto)
+    }
+
+    @GetMapping("/stations/popular")
+    fun getPopularStations() : ResponseEntity<List<PopularStationDto>> {
+        return appService.getPopularStations()
     }
 }
