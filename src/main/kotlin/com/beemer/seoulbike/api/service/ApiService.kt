@@ -8,14 +8,11 @@ import com.beemer.seoulbike.app.entity.Stations
 import com.beemer.seoulbike.app.repository.StationsRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.scheduler.Schedulers
 import java.time.LocalDateTime
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ApiService(

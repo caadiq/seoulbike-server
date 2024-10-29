@@ -33,4 +33,11 @@ interface StationsRepository : JpaRepository<Stations, String> {
         OR sd.stationAddr2 LIKE %:query%
     """)
     fun findAllByStationNoOrStationNmOrStationAddr1OrStationAddr2(pageable: Pageable, query: String): Page<Stations>
+
+    @Query("""
+        SELECT s FROM Stations s
+        LEFT JOIN s.stationDetails sd
+        WHERE s.stationId IN :stationIds
+    """)
+    fun findAllByStationIdIn(pageable: Pageable, stationIds: List<String>): Page<Stations>
 }

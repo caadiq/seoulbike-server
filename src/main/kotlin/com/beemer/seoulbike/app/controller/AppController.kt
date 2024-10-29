@@ -5,6 +5,8 @@ import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.service.AppService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -35,5 +37,16 @@ class AppController(
         @RequestParam query: String
     ) : ResponseEntity<StationSearchDto> {
         return appService.getStations(page, limit, myLat, myLon, query)
+    }
+
+    @PostMapping("/stations")
+    fun getFavoriteStations(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") limit: Int,
+        @RequestParam("my_lat") myLat: Double,
+        @RequestParam("my_lon") myLon: Double,
+        @RequestBody stationId: List<String>
+    ) : ResponseEntity<StationSearchDto> {
+        return appService.getFavoriteStations(page, limit, myLat, myLon, stationId)
     }
 }
