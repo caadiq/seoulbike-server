@@ -1,7 +1,7 @@
 package com.beemer.seoulbike.app.service
 
-import com.beemer.seoulbike.app.dto.StationListDto
 import com.beemer.seoulbike.app.dto.StationDetailsDto
+import com.beemer.seoulbike.app.dto.StationListDto
 import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.dto.StationStatusDto
 import com.beemer.seoulbike.app.repository.StationsRepository
@@ -97,7 +97,7 @@ class AppService(
         return ResponseEntity.ok(StationSearchDto(pages, counts, stationListDto))
     }
 
-    fun getFavoriteStations(page: Int, limit: Int, myLat: Double, myLon: Double, stationId: List<String>): ResponseEntity<StationSearchDto> {
+    fun getFavoriteStations(page: Int, limit: Int, myLat: Double?, myLon: Double?, stationId: List<String>): ResponseEntity<StationSearchDto> {
         val limitAdjusted = 1.coerceAtLeast(50.coerceAtMost(limit))
         val pageable = PageRequest.of(page, limitAdjusted)
 
@@ -114,11 +114,11 @@ class AppService(
 
         val counts = CountDto(totalCount, currentPageCount)
 
-        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
+        val currentLocation: Point? = if (myLat == null || myLon == null) null else geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
 
         val stationListDto = stations.content.map { station ->
             val stationPoint: Point? = station.stationDetails?.geom as? Point
-            val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
+            val distanceToStation: Double? = if (myLat == null || myLon == null) null else stationPoint?.distance(currentLocation)?.times(100000.0)
 
             StationListDto(
                 stationId = station.stationId,
