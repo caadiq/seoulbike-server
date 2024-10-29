@@ -43,8 +43,8 @@ class AppController(
     fun getFavoriteStations(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") limit: Int,
-        @RequestParam("my_lat") myLat: Double?,
-        @RequestParam("my_lon") myLon: Double?,
+        @RequestParam("my_lat") myLat: Double,
+        @RequestParam("my_lon") myLon: Double,
         @RequestBody stationId: List<String>
     ) : ResponseEntity<StationSearchDto> {
         return appService.getFavoriteStations(page, limit, myLat, myLon, stationId)

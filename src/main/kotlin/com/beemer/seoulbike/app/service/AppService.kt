@@ -55,7 +55,7 @@ class AppService(
         val limitAdjusted = 1.coerceAtLeast(50.coerceAtMost(limit))
         val pageable = PageRequest.of(page, limitAdjusted)
 
-        val stations = stationsRepository.findAllByStationNoOrStationNmOrStationAddr1OrStationAddr2(pageable, query)
+        val stations = stationsRepository.findAllByStationNoOrStationNmOrStationAddr1OrStationAddr2(pageable, myLat, myLon, query)
 
         val prevPage = if (stations.hasPrevious()) stations.number - 1 else null
         val currentPage = stations.number
@@ -97,11 +97,11 @@ class AppService(
         return ResponseEntity.ok(StationSearchDto(pages, counts, stationListDto))
     }
 
-    fun getFavoriteStations(page: Int, limit: Int, myLat: Double?, myLon: Double?, stationId: List<String>): ResponseEntity<StationSearchDto> {
+    fun getFavoriteStations(page: Int, limit: Int, myLat: Double, myLon: Double, stationId: List<String>): ResponseEntity<StationSearchDto> {
         val limitAdjusted = 1.coerceAtLeast(50.coerceAtMost(limit))
         val pageable = PageRequest.of(page, limitAdjusted)
 
-        val stations = stationsRepository.findAllByStationIdIn(pageable, stationId)
+        val stations = stationsRepository.findFavoriteStationsOrderByDistance(pageable, myLat, myLon, stationId)
 
         val prevPage = if (stations.hasPrevious()) stations.number - 1 else null
         val currentPage = stations.number
@@ -114,11 +114,11 @@ class AppService(
 
         val counts = CountDto(totalCount, currentPageCount)
 
-        val currentLocation: Point? = if (myLat == null || myLon == null) null else geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
+        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
 
         val stationListDto = stations.content.map { station ->
             val stationPoint: Point? = station.stationDetails?.geom as? Point
-            val distanceToStation: Double? = if (myLat == null || myLon == null) null else stationPoint?.distance(currentLocation)?.times(100000.0)
+            val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
             StationListDto(
                 stationId = station.stationId,
