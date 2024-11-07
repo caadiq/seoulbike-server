@@ -8,19 +8,21 @@ import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "Stations")
+@Table(name = "\"Stations\"")
 data class Stations(
     @Id
+    @Column(name = "station_id", nullable = false)
+    val stationId: String,
+
     @Column(name = "station_no", nullable = false)
     val stationNo: String,
 
-    @Column(name = "station_id")
-    val stationId: String?,
+    @Column(name = "station_nm", nullable = false)
+    val stationNm: String,
 
-    @Column(name = "station_nm")
-    val stationNm: String?,
+    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL] )
+    var stationDetails: StationDetails? = null,
 
-    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL])
-    var stationDetails: StationDetails? = null
+    @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL] )
+    var stationRealtimeStatus: StationRealtimeStatus? = null
 )
-

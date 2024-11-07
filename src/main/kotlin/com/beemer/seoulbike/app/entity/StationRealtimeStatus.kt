@@ -8,29 +8,26 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.MapsId
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import org.locationtech.jts.geom.Geometry
+import java.time.LocalDateTime
 
 @Entity
-@Table(name = "\"StationDetails\"")
-data class StationDetails(
+@Table(name = "\"StationRealtimeStatus\"")
+data class StationRealtimeStatus(
     @Id
     @Column(name = "station_id", nullable = false)
     val stationId: String,
 
-    @Column(name = "station_addr1")
-    val stationAddr1: String?,
+    @Column(name = "rack_cnt")
+    val rackCnt: Int?,
 
-    @Column(name = "station_addr2")
-    val stationAddr2: String?,
+    @Column(name = "qr_bike_cnt")
+    val qrBikeCnt: Int?,
 
-    @Column(name = "station_lat")
-    val stationLat: Double?,
+    @Column(name = "elec_bike_cnt")
+    val elecBikeCnt: Int?,
 
-    @Column(name = "station_lon")
-    val stationLon: Double?,
-
-    @Column(name = "geom", columnDefinition = "geometry(Point,4326)")
-    val geom: Geometry? = null,
+    @Column(name = "update_time", nullable = false)
+    val updateTime: LocalDateTime,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
