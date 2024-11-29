@@ -19,7 +19,7 @@
 　　<img src="https://img.shields.io/badge/spring boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
 
 - #### DataBase
-　　<img src="https://img.shields.io/badge/mariadb-003545?style=for-the-badge&logo=mariaDB&logoColor=white">
+　　<img src="https://img.shields.io/badge/postgresql-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white">
     <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
 
 - #### Server
