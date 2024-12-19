@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface StationsRepository : JpaRepository<Stations, String> {
+
+    fun findByStationId(stationId: String): Stations?
+
     @Query("SELECT s FROM Stations s WHERE s.stationId IN :stationIds")
     fun findByStationIdIn(@Param("stationIds") stationIds: List<String>): List<Stations>
 

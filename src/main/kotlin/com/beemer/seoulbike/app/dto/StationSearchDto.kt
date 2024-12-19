@@ -6,5 +6,5 @@ import com.beemer.seoulbike.common.dto.PageDto
 data class StationSearchDto(
     val page: PageDto,
     val count: CountDto,
-    val stations: List<StationListDto>
+    val stations: List<StationDto>
 )

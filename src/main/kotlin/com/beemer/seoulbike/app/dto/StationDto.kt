@@ -1,6 +1,6 @@
 package com.beemer.seoulbike.app.dto
 
-data class StationListDto(
+data class StationDto(
     val stationId: String,
     val stationNo: String,
     val stationNm: String,

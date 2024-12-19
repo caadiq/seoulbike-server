@@ -1,13 +1,15 @@
 package com.beemer.seoulbike.app.service
 
-import com.beemer.seoulbike.app.dto.PopularStationDto
+import com.beemer.seoulbike.app.dto.StationPopularDto
 import com.beemer.seoulbike.app.dto.StationDetailsDto
-import com.beemer.seoulbike.app.dto.StationListDto
+import com.beemer.seoulbike.app.dto.StationDto
 import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.dto.StationStatusDto
 import com.beemer.seoulbike.app.repository.StationsRepository
 import com.beemer.seoulbike.common.dto.CountDto
 import com.beemer.seoulbike.common.dto.PageDto
+import com.beemer.seoulbike.common.exception.CustomException
+import com.beemer.seoulbike.common.exception.ErrorCode
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
 import org.springframework.data.domain.PageRequest
@@ -24,7 +26,7 @@ class AppService(
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     private val geometryFactory = GeometryFactory()
 
-    fun getNearbyStations(myLat: Double, myLon: Double, mapLat: Double, mapLon: Double, distance: Double): ResponseEntity<List<StationListDto>> {
+    fun getNearbyStations(myLat: Double, myLon: Double, mapLat: Double, mapLon: Double, distance: Double): ResponseEntity<List<StationDto>> {
         val nearbyStations = stationsRepository.findAllByLatAndLonNearby(mapLat, mapLon, distance.div(100000.0))
 
         val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
@@ -33,7 +35,7 @@ class AppService(
             val stationPoint: Point? = station.stationDetails?.geom as? Point
             val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
-            StationListDto(
+            StationDto(
                 stationId = station.stationId,
                 stationNo = station.stationNo,
                 stationNm = station.stationNm,
@@ -52,6 +54,37 @@ class AppService(
                 )
             )
         })
+    }
+
+    fun getStation( myLat: Double, myLon: Double, stationId: String): ResponseEntity<StationDto> {
+        val station = stationsRepository.findByStationId(stationId)
+
+        val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
+        val stationPoint: Point? = station?.stationDetails?.geom as? Point
+        val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
+
+        if (station != null) {
+            return ResponseEntity.ok(StationDto(
+                stationId = station.stationId,
+                stationNo = station.stationNo,
+                stationNm = station.stationNm,
+                distance = distanceToStation,
+                stationDetails = StationDetailsDto(
+                    addr1 = station.stationDetails?.stationAddr1,
+                    addr2 = station.stationDetails?.stationAddr2,
+                    lat = station.stationDetails?.stationLat,
+                    lon = station.stationDetails?.stationLon
+                ),
+                stationStatus = StationStatusDto(
+                    rackCnt = station.stationRealtimeStatus?.rackCnt,
+                    qrBikeCnt = station.stationRealtimeStatus?.qrBikeCnt,
+                    elecBikeCnt = station.stationRealtimeStatus?.elecBikeCnt,
+                    updateTime = station.stationRealtimeStatus?.updateTime?.format(dateTimeFormatter)
+                )
+            ))
+        } else {
+            throw CustomException(ErrorCode.STATION_NOT_FOUND)
+        }
     }
 
     fun getStations(page: Int, limit: Int, myLat: Double, myLon: Double, query: String): ResponseEntity<StationSearchDto> {
@@ -73,11 +106,11 @@ class AppService(
 
         val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
 
-        val stationListDto = stations.content.map { station ->
+        val stationDto = stations.content.map { station ->
             val stationPoint: Point? = station.stationDetails?.geom as? Point
             val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
-            StationListDto(
+            StationDto(
                 stationId = station.stationId,
                 stationNo = station.stationNo,
                 stationNm = station.stationNm,
@@ -97,7 +130,7 @@ class AppService(
             )
         }
 
-        return ResponseEntity.ok(StationSearchDto(pages, counts, stationListDto))
+        return ResponseEntity.ok(StationSearchDto(pages, counts, stationDto))
     }
 
     fun getFavoriteStations(page: Int, limit: Int, myLat: Double, myLon: Double, stationId: List<String>): ResponseEntity<StationSearchDto> {
@@ -119,11 +152,11 @@ class AppService(
 
         val currentLocation: Point = geometryFactory.createPoint(org.locationtech.jts.geom.Coordinate(myLon, myLat))
 
-        val stationListDto = stations.content.map { station ->
+        val stationDto = stations.content.map { station ->
             val stationPoint: Point? = station.stationDetails?.geom as? Point
             val distanceToStation: Double? = stationPoint?.distance(currentLocation)?.times(100000.0)
 
-            StationListDto(
+            StationDto(
                 stationId = station.stationId,
                 stationNo = station.stationNo,
                 stationNm = station.stationNm,
@@ -143,29 +176,30 @@ class AppService(
             )
         }
 
-        return ResponseEntity.ok(StationSearchDto(pages, counts, stationListDto))
+        return ResponseEntity.ok(StationSearchDto(pages, counts, stationDto))
     }
 
-    fun setPopularStation(dto: PopularStationDto): ResponseEntity<Unit> {
-        redisTemplate.opsForZSet().incrementScore("popularStations", "${dto.stationNo}.${dto.stationNm}", 1.0)
+    fun setPopularStation(stationId: String): ResponseEntity<Unit> {
+        redisTemplate.opsForZSet().incrementScore("popularStations", stationId, 1.0)
         return ResponseEntity.ok().build()
     }
 
-    fun getPopularStations(): ResponseEntity<List<PopularStationDto>> {
+    fun getPopularStations(): ResponseEntity<List<StationPopularDto>> {
         val key = "popularStations"
         val zSetOperations = redisTemplate.opsForZSet()
         val typedTuples = zSetOperations.reverseRangeWithScores(key, 0, 9)
 
-        val popularStations = typedTuples?.mapNotNull { typedTuple ->
+        val popularStations = typedTuples?.mapIndexedNotNull { index, typedTuple ->
             typedTuple.value?.let { value ->
-                val parts = value.split(".")
-                if (parts.size >= 2) {
-                    PopularStationDto(
-                        stationNo = parts[0],
-                        stationNm = parts[1]
+                val station = stationsRepository.findByStationId(value)
+
+                station?.let {
+                    StationPopularDto(
+                        stationId = station.stationId,
+                        stationNo = station.stationNo,
+                        stationNm = station.stationNm,
+                        rank = index + 1
                     )
-                } else {
-                    null
                 }
             }
         } ?: emptyList()
