@@ -1,0 +1,23 @@
+services:
+  springboot:
+    image: openjdk:20-jdk-slim
+    container_name: seoulbike-springboot
+    expose:
+      - "8080"
+    working_dir: /app
+    entrypoint: ["java", "-jar", "seoulbike.jar"]
+    environment:
+      TZ: Asia/Seoul
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATA_REDIS_HOST: ${SPRING_DATA_REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT}
+    networks:
+      - app
+    restart: always
+
+networks:
+  app:
+    name: app
+    driver: bridge
