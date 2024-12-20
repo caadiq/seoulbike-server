@@ -8,23 +8,23 @@ pipeline {
             }
         }
 
-//          stage('Copy .env') {
-//             steps {
-//                 sh 'cp /var/jenkins_home/server/env/.env.movie /var/jenkins_home/workspace/movie/.env'
-//             }
-//         }
-//
-//         stage('Build JAR') {
-//             steps {
-//                 sh 'chmod +x ./gradlew'
-//                 sh './gradlew clean build -x test'
-//             }
-//         }
+         stage('Copy .env') {
+            steps {
+                sh 'cp /var/jenkins_home/server/env/.env.seoulbike /var/jenkins_home/workspace/seoulbike/.env'
+            }
+        }
+
+        stage('Build JAR') {
+            steps {
+                sh 'chmod +x ./gradlew'
+                sh './gradlew clean build -x test'
+            }
+        }
 
 //         stage('Deploy Container') {
 //             steps {
 //                 script {
-//                     dir('/var/jenkins_home/workspace/movie') {
+//                     dir('/var/jenkins_home/workspace/seoulbike') {
 //                         sh 'docker-compose down'
 //                         sh 'docker-compose up -d'
 //                     }
@@ -32,17 +32,17 @@ pipeline {
 //             }
 //         }
 
-//         stage('Copy JAR') {
-//             steps {
-//                 sh 'docker cp /var/jenkins_home/workspace/movie/build/libs/movie-1.0.0.jar movie-springboot:/app/movie.jar'
-//             }
-//         }
-//
-//         stage('Restart Container') {
-//             steps {
-//                 sh 'docker restart movie-springboot'
-//             }
-//         }
+        stage('Copy JAR') {
+            steps {
+                sh 'docker cp /var/jenkins_home/workspace/seoulbike/build/libs/seoulbike-1.0.0.jar seoulbike-springboot:/app/seoulbike.jar'
+            }
+        }
+
+        stage('Restart Container') {
+            steps {
+                sh 'docker restart seoulbike-springboot'
+            }
+        }
     }
 
     post {
