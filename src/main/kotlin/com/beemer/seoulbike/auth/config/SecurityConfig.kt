@@ -7,13 +7,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
 
     @Bean
-    fun securityFilterChain(httpSecurity: HttpSecurity): HttpSecurity {
+    fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         httpSecurity
             .httpBasic(AbstractHttpConfigurer<*, *>::disable)
             .csrf(AbstractHttpConfigurer<*, *>::disable)
@@ -24,7 +25,7 @@ class SecurityConfig {
                 authorizeRequests.anyRequest().permitAll()
             }
 
-        return httpSecurity
+        return httpSecurity.build()
     }
 
     @Bean
