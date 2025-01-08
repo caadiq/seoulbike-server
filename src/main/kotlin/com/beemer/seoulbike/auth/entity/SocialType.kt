@@ -9,6 +9,6 @@ data class SocialType(
     @Column(name = "social_type", nullable = false)
     val socialType: String,
 
-    @OneToOne(mappedBy = "social", cascade = [CascadeType.ALL])
+    @OneToOne(mappedBy = "socialType", cascade = [CascadeType.ALL])
     var users: Users? = null
 )
