@@ -22,12 +22,27 @@ enum class ErrorCode(
 
 
     /**
+     * 403 Forbidden
+     * 권한이 없는 사용자가 리소스에 접근하려고 할 때 발생하는 에러 코드
+     * ex) 일반 사용자가 관리자 페이지에 접근할 때
+     */
+
+
+    /**
      * 404 Not Found
      * 클라이언트가 요청한 리소스를 찾을 수 없을 때 발생하는 에러 코드
      * ex) 존재하지 않는 데이터를 조회할 때
      */
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 대여소를 찾을 수 없습니다."),
+    SOCIAL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 소셜 타입을 찾을 수 없습니다."),
 
+
+    /**
+     * 409 Conflict
+     * 클라이언트의 요청이 서버의 상태와 충돌이 발생했을 때 발생하는 에러 코드
+     * ex) 이미 존재하는 데이터를 생성하려고 할 때
+     */
+    EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
 
     /**
      * 500 Internal Server Error
