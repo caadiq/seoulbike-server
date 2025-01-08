@@ -14,7 +14,7 @@ data class Users(
     @Column(name = "user_id", nullable = false)
     val userId: UUID? = null,
 
-    @Column(name = "nikcname", nullable = false)
+    @Column(name = "nickname", nullable = false)
     val nickname: String,
 
     @Column(name = "email", nullable = false)
