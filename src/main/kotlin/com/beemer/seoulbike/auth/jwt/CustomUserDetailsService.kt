@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service
 class CustomUserDetailsService(
     private val usersRepository: UsersRepository
 ) : UserDetailsService {
-    override fun loadUserByUsername(username: String?): UserDetails {
-        return usersRepository.findByEmail(username!!)
-            .map { createUser(it) }
+    override fun loadUserByUsername(username: String): UserDetails {
+        return usersRepository.findByEmail(username)
+            .map(::createUser)
             .orElseThrow { throw UsernameNotFoundException("사용자를 찾을 수 없습니다.") }
 
     }

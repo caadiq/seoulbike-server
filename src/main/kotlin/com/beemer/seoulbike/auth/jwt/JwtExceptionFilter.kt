@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import java.io.IOException
 import java.time.LocalDateTime
 
 @Component
@@ -15,15 +14,14 @@ class JwtExceptionFilter : OncePerRequestFilter() {
         try {
             filterChain.doFilter(request, response)
         } catch (e: JwtTokenException) {
-            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e)
+            response.sendJwtError(HttpStatus.UNAUTHORIZED, e)
         }
     }
 
-    @Throws(IOException::class)
-    fun setErrorResponse(status: HttpStatus, response: HttpServletResponse, e: Throwable) {
-        response.status = status.value()
-        response.contentType = "application/json; charset=UTF-8"
-        response.writer.write(
+    private fun HttpServletResponse.sendJwtError(status: HttpStatus, e: Throwable) {
+        this.status = status.value()
+        this.contentType = "application/json; charset=UTF-8"
+        this.writer.write(
             JwtErrorResponse(
                 timestamp = LocalDateTime.now().toString(),
                 status = status.value(),

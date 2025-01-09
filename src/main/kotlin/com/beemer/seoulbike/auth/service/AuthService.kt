@@ -3,6 +3,7 @@ package com.beemer.seoulbike.auth.service
 import com.beemer.seoulbike.auth.dto.SignInRequestDto
 import com.beemer.seoulbike.auth.dto.SignInResponseDto
 import com.beemer.seoulbike.auth.dto.SignUpDto
+import com.beemer.seoulbike.common.dto.UserInfoDto
 import com.beemer.seoulbike.auth.entity.Users
 import com.beemer.seoulbike.auth.jwt.JwtTokenProvider
 import com.beemer.seoulbike.auth.repository.SocialTypeRepository
@@ -93,8 +94,12 @@ class AuthService(
 
             return ResponseEntity.ok(
                 SignInResponseDto(
-                    email = user.email,
-                    nickname = user.nickname,
+                    userInfo = UserInfoDto(
+                        email = user.email,
+                        nickname = user.nickname,
+                        socialType = user.socialType?.socialType,
+                        createdDate = user.createdDate
+                    ),
                     token = TokenDto(
                         accessToken = accessToken,
                         refreshToken = refreshToken

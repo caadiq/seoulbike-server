@@ -62,25 +62,18 @@ class JwtTokenProvider {
         return UsernamePasswordAuthenticationToken(principal, token, principal.authorities)
     }
 
-    fun validateToken(token: String): Boolean {
-        try {
-            Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-            return true
-        } catch (e: SignatureException) {
-            throw JwtException("JWT 토큰의 서명이 올바르지 않습니다.")
-        } catch (e: SecurityException) {
-            throw JwtException("JWT 토큰의 보안 예외가 발생했습니다.")
-        } catch (e: MalformedJwtException) {
-            throw JwtException("JWT 토큰이 잘못되었습니다.")
-        } catch (e: ExpiredJwtException) {
-            throw JwtException("JWT 토큰이 만료되었습니다.")
-        } catch (e: UnsupportedJwtException) {
-            throw JwtException("지원하지 않는 JWT 토큰입니다.")
-        } catch (e: IllegalArgumentException) {
-            throw JwtException("JWT 토큰이 비어있습니다.")
+    fun validateToken(token: String): Result<Boolean> = runCatching {
+        validateTokenClaims(token)
+        true
+    }.onFailure { e ->
+        when (e) {
+            is SignatureException -> throw JwtException("JWT 토큰의 서명이 올바르지 않습니다.")
+            is SecurityException -> throw JwtException("JWT 토큰의 보안 예외가 발생했습니다.")
+            is MalformedJwtException -> throw JwtException("JWT 토큰이 잘못되었습니다.")
+            is ExpiredJwtException -> throw JwtException("JWT 토큰이 만료되었습니다.")
+            is UnsupportedJwtException -> throw JwtException("지원하지 않는 JWT 토큰입니다.")
+            is IllegalArgumentException -> throw JwtException("JWT 토큰이 비어있습니다.")
+            else -> throw e
         }
     }
 
@@ -94,5 +87,12 @@ class JwtTokenProvider {
         } catch (e: ExpiredJwtException) {
             e.claims
         }
+    }
+
+    private fun validateTokenClaims(token: String) {
+        Jwts.parser()
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token)
     }
 }
