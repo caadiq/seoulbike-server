@@ -1,5 +1,7 @@
 package com.beemer.seoulbike.auth.controller
 
+import com.beemer.seoulbike.auth.dto.SignInRequestDto
+import com.beemer.seoulbike.auth.dto.SignInResponseDto
 import com.beemer.seoulbike.auth.dto.SignUpDto
 import com.beemer.seoulbike.auth.service.AuthService
 import org.springframework.http.ResponseEntity
@@ -15,5 +17,10 @@ class AuthController(
     @PostMapping("/signup")
     fun signUp(@RequestBody dto: SignUpDto) : ResponseEntity<Unit> {
         return authService.signUp(dto)
+    }
+
+    @PostMapping("/signin")
+    fun signIn(@RequestBody dto: SignInRequestDto) : ResponseEntity<SignInResponseDto> {
+        return authService.signIn(dto)
     }
 }

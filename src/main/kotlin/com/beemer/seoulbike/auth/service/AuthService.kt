@@ -1,12 +1,19 @@
 package com.beemer.seoulbike.auth.service
 
+import com.beemer.seoulbike.auth.dto.SignInRequestDto
+import com.beemer.seoulbike.auth.dto.SignInResponseDto
 import com.beemer.seoulbike.auth.dto.SignUpDto
 import com.beemer.seoulbike.auth.entity.Users
+import com.beemer.seoulbike.auth.jwt.JwtTokenProvider
 import com.beemer.seoulbike.auth.repository.SocialTypeRepository
 import com.beemer.seoulbike.auth.repository.UsersRepository
+import com.beemer.seoulbike.common.dto.TokenDto
 import com.beemer.seoulbike.common.exception.CustomException
 import com.beemer.seoulbike.common.exception.ErrorCode
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional
 class AuthService(
     private val usersRepository: UsersRepository,
     private val socialTypeRepository: SocialTypeRepository,
-    private val bCryptPasswordEncoder: BCryptPasswordEncoder
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val authenticationManagerBuilder: AuthenticationManagerBuilder
 ) {
     @Transactional
     fun signUp(dto: SignUpDto) : ResponseEntity<Unit> {
@@ -59,5 +68,41 @@ class AuthService(
         usersRepository.save(users)
 
         return ResponseEntity.ok().build()
+    }
+
+    fun signIn(dto: SignInRequestDto): ResponseEntity<SignInResponseDto> {
+        val email = dto.email.trim()
+        val password = dto.password.trim()
+
+        if (email.isEmpty())
+            throw CustomException(ErrorCode.EMAIL_EMPTY)
+
+        if (password.isEmpty())
+            throw CustomException(ErrorCode.PASSWORD_EMPTY)
+
+        try {
+            val authenticationToken = UsernamePasswordAuthenticationToken(email, password)
+
+            val authentication = authenticationManagerBuilder.`object`.authenticate(authenticationToken)
+
+            val accessToken = jwtTokenProvider.generateAccessToken(authentication)
+            val refreshToken = jwtTokenProvider.generateRefreshToken()
+
+            val user = usersRepository.findByEmail(authentication.name)
+                .orElseThrow { throw CustomException(ErrorCode.USER_NOT_FOUND) }
+
+            return ResponseEntity.ok(
+                SignInResponseDto(
+                    email = user.email,
+                    nickname = user.nickname,
+                    token = TokenDto(
+                        accessToken = accessToken,
+                        refreshToken = refreshToken
+                    )
+                )
+            )
+        } catch (e: BadCredentialsException) {
+            throw CustomException(ErrorCode.BAD_CREDENTIALS)
+        }
     }
 }

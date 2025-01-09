@@ -18,6 +18,7 @@ enum class ErrorCode(
     EMAIL_INVALID(HttpStatus.BAD_REQUEST, "잘못된 이메일 형식입니다."),
     PASSWORD_EMPTY(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요."),
     PASSWORD_INVALID(HttpStatus.BAD_REQUEST, "비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다."),
+    BAD_CREDENTIALS(HttpStatus.BAD_REQUEST, "이메일 또는 비밀번호가 일치하지 않습니다."),
 
 
     /**
@@ -41,6 +42,7 @@ enum class ErrorCode(
      */
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 대여소를 찾을 수 없습니다."),
     SOCIAL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 소셜 타입을 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 
 
     /**
