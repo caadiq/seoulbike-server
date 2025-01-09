@@ -33,7 +33,6 @@ dependencies {
     implementation("org.hibernate:hibernate-spatial:6.6.1.Final")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("io.jsonwebtoken:jjwt:0.12.6")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.security:spring-security-test")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.postgresql:postgresql")

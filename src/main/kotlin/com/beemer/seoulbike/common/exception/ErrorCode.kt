@@ -12,6 +12,12 @@ enum class ErrorCode(
      * ex) 필수 요청 파라미터가 누락된 경우
      */
     INVALID_FIELD(HttpStatus.BAD_REQUEST, "잘못된 필드입니다."),
+    NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "닉네임을 입력해주세요."),
+    NICKNAME_INVALID(HttpStatus.BAD_REQUEST, "닉네임은 한글, 영문을 포함한 2~16자리여야 합니다."),
+    EMAIL_EMPTY(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요."),
+    EMAIL_INVALID(HttpStatus.BAD_REQUEST, "잘못된 이메일 형식입니다."),
+    PASSWORD_EMPTY(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요."),
+    PASSWORD_INVALID(HttpStatus.BAD_REQUEST, "비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자리여야 합니다."),
 
 
     /**
