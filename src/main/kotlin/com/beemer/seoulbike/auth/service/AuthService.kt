@@ -27,9 +27,10 @@ class AuthService(
         val users = Users(
             nickname = dto.nickname,
             email = dto.email,
-            password = dto.password,
-            socialType = socialType
+            password = dto.password
         )
+
+        users.socialType = socialType
 
         usersRepository.save(users)
 

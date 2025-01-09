@@ -3,35 +3,46 @@ package com.beemer.seoulbike.auth.entity
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 @Table(name = "\"Users\"")
-data class Users(
+class Users(
+    nickname: String,
+    email: String,
+    password: String
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", nullable = false)
-    val userId: UUID? = null,
+    val userId: UUID? = null
 
     @Column(name = "nickname", nullable = false)
-    val nickname: String,
+    var nickname: String = nickname
+        protected set
 
     @Column(name = "email", nullable = false)
-    val email: String,
+    var email: String = email
+        protected set
 
     @Column(name = "password", nullable = false)
-    val password: String,
+    var password: String = password
+        protected set
 
     @CreatedDate
-    @Column(name = "created_date", nullable = false)
-    val createdDate: LocalDateTime? = null,
+    @Column(name = "created_date", nullable = false, updatable = false)
+    var createdDate: LocalDateTime? = null
+        protected set
 
     @LastModifiedDate
     @Column(name = "modified_date", nullable = false)
-    val modifiedDate: LocalDateTime? = null,
+    var modifiedDate: LocalDateTime?= null
+        protected set
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_type")
-    val socialType: SocialType
-)
+    var socialType: SocialType? = null
+}
