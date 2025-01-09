@@ -3,6 +3,7 @@ package com.beemer.seoulbike.auth.config
 import com.beemer.seoulbike.auth.jwt.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
@@ -40,8 +41,15 @@ class SecurityConfig(
 
             .authorizeHttpRequests { authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/signup").permitAll()
-                    .requestMatchers("/signin").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/signup").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/signin").permitAll()
+
+                    .requestMatchers(HttpMethod.GET, "/station").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/stations").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/stations").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/stations/nearby").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/stations/popular").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/stations/popular").permitAll()
 
                     .anyRequest().authenticated()
             }
