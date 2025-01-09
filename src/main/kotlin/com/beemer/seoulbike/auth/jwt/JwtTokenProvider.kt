@@ -1,6 +1,8 @@
 package com.beemer.seoulbike.auth.jwt
 
 import io.jsonwebtoken.*
+import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -22,7 +24,10 @@ class JwtTokenProvider {
     @Value("\${jwt.token.refresh-expiration-time}")
     private var refreshTokenExpirationTime: Long = 0
 
-    private fun getSigningKey(): SecretKey = Jwts.SIG.HS256.key().build()
+    private fun getSigningKey(): SecretKey {
+        val keyBytes = Decoders.BASE64.decode(secretKey)
+        return Keys.hmacShaKeyFor(keyBytes)
+    }
 
     fun generateAccessToken(authentication: Authentication): String {
         return Jwts.builder()
