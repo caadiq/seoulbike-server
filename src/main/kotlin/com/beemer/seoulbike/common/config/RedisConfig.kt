@@ -29,8 +29,8 @@ class RedisConfig : CachingConfigurer {
     fun redisConnectionFactory(): RedisConnectionFactory = LettuceConnectionFactory(host, port)
 
     @Bean
-    fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Object> {
-        val redisTemplate = RedisTemplate<String, Object>().apply {
+    fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val redisTemplate = RedisTemplate<String, Any>().apply {
             connectionFactory = redisConnectionFactory
             keySerializer = StringRedisSerializer()
             valueSerializer = Jackson2JsonRedisSerializer(String::class.java)
