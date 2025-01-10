@@ -8,6 +8,7 @@ import com.beemer.seoulbike.auth.entity.Users
 import com.beemer.seoulbike.auth.jwt.JwtTokenProvider
 import com.beemer.seoulbike.auth.repository.SocialTypeRepository
 import com.beemer.seoulbike.auth.repository.UsersRepository
+import com.beemer.seoulbike.auth.utils.SecurityUtil
 import com.beemer.seoulbike.common.dto.TokenDto
 import com.beemer.seoulbike.common.exception.CustomException
 import com.beemer.seoulbike.common.exception.ErrorCode
@@ -25,7 +26,8 @@ class AuthService(
     private val socialTypeRepository: SocialTypeRepository,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val authenticationManagerBuilder: AuthenticationManagerBuilder
+    private val authenticationManagerBuilder: AuthenticationManagerBuilder,
+    private val securityUtil: SecurityUtil
 ) {
     @Transactional
     fun signUp(dto: SignUpDto) : ResponseEntity<Unit> {
@@ -109,5 +111,18 @@ class AuthService(
         } catch (e: BadCredentialsException) {
             throw CustomException(ErrorCode.BAD_CREDENTIALS)
         }
+    }
+
+    fun getUserInfo(): ResponseEntity<UserInfoDto> {
+        val user = securityUtil.getCurrentUser()
+
+        return ResponseEntity.ok(
+            UserInfoDto(
+                email = user.email,
+                nickname = user.nickname,
+                socialType = user.socialType?.socialType,
+                createdDate = user.createdDate
+            )
+        )
     }
 }
