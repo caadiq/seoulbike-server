@@ -26,6 +26,7 @@ enum class ErrorCode(
      * 클라이언트가 인증되지 않은 상태에서 보호된 리소스에 접근하려고 할 때 발생하는 에러 코드
      * ex) 로그인하지 않은 사용자가 로그인이 필요한 페이지에 접근할 때
      */
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
 
 
     /**
@@ -51,6 +52,7 @@ enum class ErrorCode(
      * ex) 이미 존재하는 데이터를 생성하려고 할 때
      */
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+    FAVORITE_STATION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 즐겨찾기에 추가된 대여소입니다."),
 
     /**
      * 500 Internal Server Error

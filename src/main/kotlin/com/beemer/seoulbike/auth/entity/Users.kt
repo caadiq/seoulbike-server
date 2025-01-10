@@ -1,5 +1,6 @@
 package com.beemer.seoulbike.auth.entity
 
+import com.beemer.seoulbike.app.entity.FavoriteStations
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -39,10 +40,13 @@ class Users(
 
     @LastModifiedDate
     @Column(name = "modified_date", nullable = false)
-    var modifiedDate: LocalDateTime?= null
+    var modifiedDate: LocalDateTime? = null
         protected set
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_type")
     var socialType: SocialType? = null
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
+    var favoriteStations: MutableList<FavoriteStations> = mutableListOf()
 }

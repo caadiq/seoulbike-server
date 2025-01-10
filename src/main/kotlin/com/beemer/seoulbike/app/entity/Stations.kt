@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
@@ -32,4 +33,7 @@ class Stations(
 
     @OneToOne(mappedBy = "station", cascade = [CascadeType.ALL])
     var stationRealtimeStatus: StationRealtimeStatus? = null
+
+    @OneToMany(mappedBy = "station", cascade = [CascadeType.ALL])
+    var favoriteStations: MutableList<FavoriteStations> = mutableListOf()
 }

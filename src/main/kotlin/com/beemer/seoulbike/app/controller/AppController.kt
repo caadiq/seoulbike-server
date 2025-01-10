@@ -6,6 +6,7 @@ import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.service.AppService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
@@ -68,5 +69,12 @@ class AppController(
     @GetMapping("/stations/popular")
     fun getPopularStations() : ResponseEntity<List<StationPopularDto>> {
         return appService.getPopularStations()
+    }
+
+    @PostMapping("/stations/favorite/{station_id}")
+    fun addFavoriteStation(
+        @PathVariable("station_id") stationId: String
+    ) : ResponseEntity<Unit> {
+        return appService.addFavoriteStation(stationId)
     }
 }

@@ -17,8 +17,7 @@ class StationDetails(
     stationAddr1: String?,
     stationAddr2: String?,
     stationLat: Double?,
-    stationLon: Double?,
-    geom: Geometry? = null,
+    stationLon: Double?
 ) {
     @Id
     @Column(name = "station_id", nullable = false)
@@ -42,7 +41,7 @@ class StationDetails(
         protected set
 
     @Column(name = "geom", columnDefinition = "geometry(Point,4326)")
-    var geom: Geometry? = geom
+    var geom: Geometry? = null
         protected set
 
     @OneToOne(fetch = FetchType.LAZY)

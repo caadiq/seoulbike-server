@@ -5,7 +5,10 @@ import com.beemer.seoulbike.app.dto.StationDetailsDto
 import com.beemer.seoulbike.app.dto.StationDto
 import com.beemer.seoulbike.app.dto.StationSearchDto
 import com.beemer.seoulbike.app.dto.StationStatusDto
+import com.beemer.seoulbike.app.entity.FavoriteStations
+import com.beemer.seoulbike.app.repository.FavoriteStationsRepository
 import com.beemer.seoulbike.app.repository.StationsRepository
+import com.beemer.seoulbike.auth.utils.SecurityUtil
 import com.beemer.seoulbike.common.dto.CountDto
 import com.beemer.seoulbike.common.dto.PageDto
 import com.beemer.seoulbike.common.exception.CustomException
@@ -16,12 +19,15 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.format.DateTimeFormatter
 
 @Service
 class AppService(
     private val stationsRepository: StationsRepository,
-    private val redisTemplate: RedisTemplate<String, String>
+    private val favoriteStationsRepository: FavoriteStationsRepository,
+    private val redisTemplate: RedisTemplate<String, String>,
+    private val securityUtil: SecurityUtil
 ) {
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     private val geometryFactory = GeometryFactory()
@@ -205,5 +211,25 @@ class AppService(
         } ?: emptyList()
 
         return ResponseEntity.ok().body(popularStations)
+    }
+
+    @Transactional
+    fun addFavoriteStation(stationId: String): ResponseEntity<Unit> {
+        val userId = securityUtil.getCurrentUser()
+
+        val station = stationsRepository.findByStationId(stationId)
+            ?: throw CustomException(ErrorCode.STATION_NOT_FOUND)
+
+        favoriteStationsRepository.findByUserAndStation(userId, station)
+            ?.let { throw CustomException(ErrorCode.FAVORITE_STATION_ALREADY_EXISTS) }
+
+        val favoriteStation = FavoriteStations().apply {
+            user = userId
+            this.station = station
+        }
+
+        favoriteStationsRepository.save(favoriteStation)
+
+        return ResponseEntity.ok().build()
     }
 }
