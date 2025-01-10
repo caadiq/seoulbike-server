@@ -57,8 +57,7 @@ class ApiService(
                             stationAddr1 = row.staAdd1,
                             stationAddr2 = row.staAdd2,
                             stationLat = row.staLat.toDouble(),
-                            stationLon = row.staLong.toDouble(),
-                            station = station
+                            stationLon = row.staLong.toDouble()
                         )
 
                         station.stationDetails = stationDetails
@@ -102,9 +101,9 @@ class ApiService(
                                 rackCnt = station.rackTotCnt.toIntOrNull(),
                                 qrBikeCnt = station.parkingQRBikeCnt.toIntOrNull(),
                                 elecBikeCnt = station.parkingELECBikeCnt.toIntOrNull(),
-                                updateTime = updateTime,
-                                station = existingStation
+                                updateTime = updateTime
                             )
+
                             existingStation.stationRealtimeStatus = realtimeStatus
                             stationsList.add(existingStation)
                         }

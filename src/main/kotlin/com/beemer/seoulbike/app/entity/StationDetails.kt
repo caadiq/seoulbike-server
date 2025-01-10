@@ -12,28 +12,41 @@ import org.locationtech.jts.geom.Geometry
 
 @Entity
 @Table(name = "\"StationDetails\"")
-data class StationDetails(
+class StationDetails(
+    stationId: String,
+    stationAddr1: String?,
+    stationAddr2: String?,
+    stationLat: Double?,
+    stationLon: Double?,
+    geom: Geometry? = null,
+) {
     @Id
     @Column(name = "station_id", nullable = false)
-    val stationId: String,
+    var stationId: String = stationId
+        protected set
 
     @Column(name = "station_addr1")
-    val stationAddr1: String?,
+    var stationAddr1: String? = stationAddr1
+        protected set
 
     @Column(name = "station_addr2")
-    val stationAddr2: String?,
+    var stationAddr2: String? = stationAddr2
+        protected set
 
     @Column(name = "station_lat")
-    val stationLat: Double?,
+    var stationLat: Double? = stationLat
+        protected set
 
     @Column(name = "station_lon")
-    val stationLon: Double?,
+    var stationLon: Double? = stationLon
+        protected set
 
     @Column(name = "geom", columnDefinition = "geometry(Point,4326)")
-    val geom: Geometry? = null,
+    var geom: Geometry? = geom
+        protected set
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
     @MapsId
-    val station: Stations
-)
+    var station: Stations? = null
+}

@@ -4,11 +4,14 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "\"SocialType\"")
-data class SocialType(
+class SocialType(
+    socialType: String
+) {
     @Id
     @Column(name = "social_type", nullable = false)
-    val socialType: String,
+    var socialType: String = socialType
+        protected set
 
     @OneToOne(mappedBy = "socialType", cascade = [CascadeType.ALL])
     var users: Users? = null
-)
+}

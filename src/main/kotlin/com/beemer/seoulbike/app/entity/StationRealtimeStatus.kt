@@ -12,25 +12,36 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "\"StationRealtimeStatus\"")
-data class StationRealtimeStatus(
+class StationRealtimeStatus(
+    stationId: String,
+    rackCnt: Int?,
+    qrBikeCnt: Int?,
+    elecBikeCnt: Int?,
+    updateTime: LocalDateTime
+) {
     @Id
     @Column(name = "station_id", nullable = false)
-    val stationId: String,
+    var stationId: String = stationId
+        protected set
 
     @Column(name = "rack_cnt")
-    val rackCnt: Int?,
+    var rackCnt: Int? = rackCnt
+        protected set
 
     @Column(name = "qr_bike_cnt")
-    val qrBikeCnt: Int?,
+    var qrBikeCnt: Int? = qrBikeCnt
+        protected set
 
     @Column(name = "elec_bike_cnt")
-    val elecBikeCnt: Int?,
+    var elecBikeCnt: Int? = elecBikeCnt
+        protected set
 
     @Column(name = "update_time", nullable = false)
-    val updateTime: LocalDateTime,
+    var updateTime: LocalDateTime = updateTime
+        protected set
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
     @MapsId
-    val station: Stations
-)
+    var station: Stations? = null
+}
